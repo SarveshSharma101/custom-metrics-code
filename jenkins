@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+    environment{
+        DOCKERHUB_CRED = credentials('192c0532-606d-4e2c-81bb-bd5387fcb182')
+        REPO_NAME = "sarveshdockerrepo/prometheus"
+        POD_TAG = "pod"
+        SERVICE_TAG = "service"
+    }
+    stages {
+        stage('Build') {
+            steps {
+                sh 'docker build -t $REPO_NAME:$POD_TAG CustomMetricsXPORTER-GoApp/'
+            }
+        }
+        stage('Login') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+            }
+        }
+        stage('Push') {
+            steps {
+                sh 'docker push $REPO_NAME:$POD_TAG'
+            }
+        }
+    }
+    post{
+        always{
+            sh 'docker logout'
+        }
+    }
+}
