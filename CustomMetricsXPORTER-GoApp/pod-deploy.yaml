@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: podmonitor-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-deployment
+  namespace: podmonitor-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pod-deployment
+  template:
+    metadata:
+      labels:
+        app: pod-deployment
+    spec:
+      containers:
+        - name: service-deployment
+          image: sarveshdockerrepo/prometheus:pod
+          imagePullPolicy: Always  
+          ports:
+            - name: pod
+              containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pod-deployment-service
+  namespace: podmonitor-test
+spec:
+  selector:
+    app: pod-deployment
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000

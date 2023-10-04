@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: servicemonitor-test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-deployment
+  namespace: servicemonitor-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-deployment
+  template:
+    metadata:
+      labels:
+        app: service-deployment
+    spec:
+      containers:
+        - name: service-deployment
+          image: sarveshdockerrepo/prometheus:service
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-deployment-service
+  labels:
+    metrics: service
+  namespace: servicemonitor-test
+spec:
+  selector:
+    app: service-deployment
+  type: ClusterIP
+  ports:
+    - name: web
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

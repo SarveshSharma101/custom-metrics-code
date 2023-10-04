@@ -1,0 +1,21 @@
+# Start with the Go official image as the base
+FROM golang:1.17
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Go module files and download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the server source code to the container
+COPY main.go ./
+
+# Build the server binary
+RUN go build -o server .
+
+# Expose port 3000 to the outside world
+EXPOSE 3000
+
+# Start the server
+CMD ["./server"]
